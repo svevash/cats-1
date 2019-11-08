@@ -1,0 +1,72 @@
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+struct request {
+    int start, finish;
+};
+
+void swap (request* a, request* b) {
+    request t = *a;
+    *a = *b;
+    *b = t;
+}
+
+int partition (request arr[], int low, int high) {
+    request pivot = arr[high];
+    int i = (low - 1);
+
+    for (int j = low; j < high; j++) {
+        if (arr[j].start <= pivot.start) {
+            i++;
+            swap(arr[i], arr[j]);
+        }
+    }
+    swap(arr[i + 1], arr[high]);
+    return (i + 1);
+}
+
+void qs (request arr[], int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+
+        qs(arr, low, pi - 1);
+        qs(arr, pi + 1, high);
+    }
+}
+
+int main () {
+    int n;
+
+    ifstream inp("input.txt");
+    inp >> n;
+    request list[n];
+    for (int i = 0; i < n; ++i) {
+         inp >> list[i].start >> list[i].finish;
+    }
+    inp.close();
+
+    qs(list, 0, n - 1);
+
+    int count = 1;
+    for (int i = 0; i < n; ++i) {
+        cout << list[i].start << ' ' << list[i].finish << "\n";
+    }
+    
+    int j = n-1;
+    int k = n-2;
+    while (j > 0 && k >= 0) {
+        if (list[j].start >= list[k].finish) {
+            count++;
+            j = k;
+        }
+        else {
+            k--;
+        }
+    }
+    ofstream out("output.txt");
+    out << count;
+    out.close();
+    return 0;
+}

@@ -1,0 +1,39 @@
+#include <iostream>
+#include <stack>
+#include <fstream>
+
+struct num {
+    int value, index;
+};
+
+using namespace std;
+
+int main() {
+    int n;
+    ifstream inp("input.txt");
+    inp >> n;
+    num a[n];
+    stack<num> st;
+
+    for (int i = 0; i < n; ++i) {
+        inp >> a[i].value;
+        a[i].index = i;
+        if (st.empty() || st.top().value > a[i].value) {
+            st.push(a[i]);
+        }
+        else {
+            while (!st.empty() && st.top().value < a[i].value) {
+                a[st.top().index].value = a[i].value;
+                st.pop();
+            }
+            st.push(a[i]);
+        }
+    }
+    inp.close();
+    ofstream out("output.txt");
+    for (int i = 0; i < n; ++i) {
+        out << a[i].value << ' ';
+    }
+    out.close();
+    return 0;
+}

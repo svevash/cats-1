@@ -1,0 +1,39 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <set>
+
+using namespace std;
+
+int main() {
+    int n, num, m, cut = 0;
+    vector<int> a;
+    set<int> b, d;
+    ifstream inp("input.txt");
+    inp >> n;
+    for (int i = 0; i < n; ++i) {
+        inp >> num;
+        a.push_back(num);
+    }
+    inp >> m;
+    for (int i = 0; i < m; ++i) {
+        inp >> num;
+        b.insert(num);
+    }
+    inp.close();
+
+    for (int i = 0; i < n; ++i) {
+        if (b.find(a[i]) != b.end()) {
+            d.insert(a[i]);
+        }
+        if (d.size() >= m) {
+            cut++;
+            d.clear();
+            d.insert(a[i]);
+        }
+    }
+    ofstream out("output.txt");
+    out << cut;
+    out.close();
+    return 0;
+}
