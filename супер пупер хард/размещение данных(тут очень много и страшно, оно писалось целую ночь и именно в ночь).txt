@@ -1,0 +1,123 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <set>
+
+using namespace std;
+
+const int MoD = 1000000007;
+
+struct edge{
+    int v, u;
+};
+
+void findBridges (int v, int p, vector<vector<int>> &graph, vector<bool> &used, vector<int> &tin,
+                  vector<int> &fup, int &timer, set<pair<int, int>> &bridges) {
+    used[v] = true;
+    tin[v] = fup[v] = timer++;
+    for (int i = 0; i < graph[v].size(); ++i) {
+        int to = graph[v][i];
+        if (to == p)  continue;
+        if (used[to])
+            fup[v] = min(fup[v], tin[to]);
+        else {
+            findBridges(to, v, graph, used, tin, fup, timer, bridges);
+            fup[v] = min(fup[v], fup[to]);
+            if (fup[to] > tin[v]) {
+                bridges.insert(make_pair(v, to));
+                bridges.insert(make_pair(to, v));
+            }
+        }
+    }
+}
+
+void dfs(int v, int &ins, vector<vector<int>> &graph, vector<int> &connections, set<pair<int, int>> &bridges,
+         vector<bool> &used, vector<int> &conSize) {
+    used[v] = true;
+    connections[v] = ins;
+    conSize[ins]++;
+    for (int i = 0; i < graph[v].size(); i++) {
+        if (!used[graph[v][i]]) {
+            auto search = bridges.find(make_pair(v, graph[v][i]));
+            if (search != bridges.end()) {
+                continue;
+            }
+            else {
+                dfs(graph[v][i], ins, graph, connections, bridges, used, conSize);
+            }
+        }
+    }
+}
+
+int main() {
+    int n, m, x1, x2;
+    
+    ifstream inp ("data.in");
+    inp >> n >> m;
+    vector<vector<int>> graph(n);
+    
+    for (int i = 0; i < m; ++i) {
+        inp >> x1 >> x2;
+        graph[x1 - 1].push_back(x2 - 1);
+        graph[x2 - 1].push_back(x1 - 1);
+    }
+    inp.close();
+    
+    vector<bool> used(n, false);
+    vector<int> tin(n);
+    vector<int> fup(n);
+    int timer = -1;
+    
+    set<pair<int, int>> bridges;
+    
+    findBridges(0, -1, graph, used, tin, fup, timer, bridges);
+    
+    int countConnections = bridges.size() / 2 + 1;
+    vector<int> connections(n, -1);
+    used.assign(n, false);
+    
+    int ins = 0;
+    vector<int> conSize(countConnections);
+    
+    dfs(0, ins, graph, connections, bridges, used, conSize);
+
+    for (int i = 0; i < n; ++i) {
+        if (!used[i]) {
+            ins++;
+            dfs(i, ins, graph, connections, bridges, used, conSize);
+        }
+    }
+
+    vector<vector<int>> newGraph(countConnections);
+    
+    for (const auto & bridge : bridges) {
+        newGraph[connections[bridge.first]].push_back(connections[bridge.second]);
+    }
+
+    if (bridges.empty()) {
+        conSize[0] = connections.size();
+    }
+
+    long long int res = 1;
+    long long int resOptional = 1;
+    long long int sum = 0;
+    
+    for (int i = 0; i < countConnections; i++) {
+        resOptional *= conSize[i];
+        resOptional %= MoD;
+        if (newGraph[i].size() == 1) {
+            sum++;
+            res *= conSize[i];
+            res %= MoD;
+        }
+    }
+
+    if (sum == 0) {
+        sum = 1;
+        res = resOptional;
+    }
+    ofstream out ("data.out");
+    out << sum << " " << res;
+    out.close();
+    return 0;
+}
