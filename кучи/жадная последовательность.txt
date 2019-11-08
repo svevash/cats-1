@@ -1,0 +1,112 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <algorithm>
+
+using namespace std;
+
+struct el {
+    int value, index;
+};
+
+struct minheap {
+    vector<el> data;
+    int actsize;
+};
+
+void swap (el* a, el* b) {
+    el t = *a;
+    *a = *b;
+    *b = t;
+}
+
+int partition (minheap &heap, int low, int high) {
+    el pivot = heap.data[high];
+    int i = (low - 1);
+
+    for (int j = low; j < high; j++) {
+        if (heap.data[j].index <= pivot.index) {
+            i++;
+            swap(heap.data[i], heap.data[j]);
+        }
+    }
+    swap(heap.data[i + 1], heap.data[high]);
+    return (i + 1);
+}
+
+void qs (minheap &heap, int low, int high) {
+    if (low < high) {
+        int pi = partition(heap, low, high);
+
+        qs(heap, low, pi - 1);
+        qs(heap, pi + 1, high);
+    }
+}
+
+void sifdown (int i, minheap &heap) {
+    while (2 * i + 1 < heap.actsize) {
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+        int j = left;
+
+        if ((right < heap.actsize) && ((heap.data[right].value < heap.data[left].value) ||
+        ((heap.data[right].value == heap.data[left].value) && (heap.data[right].index < heap.data[left].index)))) {
+            j = right;
+        }
+        if ((heap.data[i].value > heap.data[j].value) ||
+        ((heap.data[i].value == heap.data[j].value) && (heap.data[i].index > heap.data[j].index))) {
+
+            swap(heap.data[i], heap.data[j]);
+            i = j;
+        }
+        else {
+            break;
+        }
+    }
+}
+
+void build (minheap &heap) {
+    for (int i = heap.actsize / 2; i >= 0; i--) {
+        sifdown(i, heap);
+    }
+}
+
+int main() {
+    minheap heap;
+    int n, m;
+    ifstream inp("input.txt");
+    inp >> n >> m;
+
+    heap.data.resize(n);
+    heap.actsize = n;
+    for (int i = 0; i < n; ++i) {
+        inp >> heap.data[i].value;
+        heap.data[i].index = i;
+    }
+    inp.close();
+
+    build(heap);
+
+    int inm = n;
+    for (int i = 0; i < m; ++i) {
+        int mins = heap.data[0].value;
+        heap.data[0] = heap.data[heap.actsize-1];
+        heap.actsize--;
+        sifdown(0, heap);
+
+        mins += heap.data[0].value;
+        heap.data[0].value = mins;
+        heap.data[0].index = inm;
+        inm++;
+        sifdown(0, heap);
+    }
+
+    ofstream out("output.txt");
+
+    qs(heap, 0, heap.actsize-1);
+    for (int j = 0; j < heap.actsize; ++j) {
+        out << heap.data[j].value << ' ';
+    }
+    out.close();
+    return 0;
+}

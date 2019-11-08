@@ -1,0 +1,121 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+struct mheap {
+    vector<int> data;
+    int actsize;
+};
+
+void sifdownmin (mheap &heap, int i) {
+    while (2 * i + 1 < heap.actsize) {
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+
+        int j = left;
+
+        if (right < heap.actsize && heap.data[right] < heap.data[left]) {
+            j = right;
+        }
+
+        if (heap.data[i] <= heap.data[j]) {
+            break;
+        }
+        swap(heap.data[i], heap.data[j]);
+        i = j;
+    }
+}
+
+void sifdownmax (mheap &heap, int i) {
+    while (2 * i + 1 < heap.actsize) {
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+
+        int j = left;
+
+        if (right < heap.actsize && heap.data[right] > heap.data[left]) {
+            j = right;
+        }
+
+        if (heap.data[i] >= heap.data[j]) {
+            break;
+        }
+        swap(heap.data[i], heap.data[j]);
+        i = j;
+    }
+}
+
+void sifupmin (mheap &heap, int i) {
+    while (i > 0 && heap.data[i] < heap.data[(i - 1) / 2]) {
+        swap(heap.data[i], heap.data[(i - 1) / 2]);
+        i = (i - 1) / 2;
+    }
+}
+
+void sifupmax (mheap &heap, int i) {
+    while (i > 0 && heap.data[i] > heap.data[(i - 1) / 2]) {
+        swap(heap.data[i], heap.data[(i - 1) / 2]);
+        i = (i - 1) / 2;
+    }
+}
+
+void addmin (mheap &heap, int v) {
+    heap.data[heap.actsize] = v;
+    heap.actsize++;
+    sifupmin(heap, heap.actsize - 1);
+}
+
+void addmax (mheap &heap, int v) {
+    heap.data[heap.actsize] = v;
+    heap.actsize++;
+    sifupmax(heap, heap.actsize - 1);
+}
+
+int extractmin (mheap &heap) {
+    int min = heap.data[0];
+
+    heap.data[0] = heap.data[heap.actsize - 1];
+    heap.actsize--;
+    sifdownmin(heap, 0);
+
+    return min;
+}
+
+int extractmax (mheap &heap) {
+    int max = heap.data[0];
+
+    heap.data[0] = heap.data[heap.actsize - 1];
+    heap.actsize--;
+    sifdownmax(heap, 0);
+
+    return max;
+}
+
+int main() {
+    int n, el;
+    mheap small, big;
+    ifstream inp("input.txt");
+    ofstream out("output.txt");
+    inp >> n;
+    
+    small.data.resize(n);
+    big.data.resize(n);
+    small.actsize = 0;
+    big.actsize = 0;
+    
+    for (int i = 0; i < n; ++i) {
+        inp >> el;
+        addmax(small, el);
+        addmin(big, extractmax(small));
+        if (big.actsize > small.actsize) {
+            addmax(small, extractmin(big));
+        }
+        out << small.data[0] << ' ';
+    }
+
+    inp.close();
+    out.close();
+    return 0;
+}
