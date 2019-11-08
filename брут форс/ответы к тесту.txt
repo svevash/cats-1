@@ -1,0 +1,64 @@
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+vector<char> plmin{'-', '+'};
+
+struct shusha {
+    int mark;
+    string an;
+};
+
+void rec (string s, int pos, const int n, const int k, vector<shusha> &test, string &res) {
+    if (pos >= k) {
+        for (int i = 0; i < n; ++i) {         
+            int count = 0;
+
+            for (int j = 0; j < k; ++j) {           
+                if (test[i].an[j] == s[j]) {
+                    count++;
+                }
+            }
+
+            if (count != test[i].mark) {
+                break;
+            }
+
+            if (i == n - 1) {
+                res = s;
+                return;
+            }
+        }
+        return;
+    }
+
+    for (int i = 0; i < 2; i++) {
+        char c = plmin[i];
+        rec(s + c, pos + 1, n, k, test, res);
+    }
+}
+
+int main () {
+    int n, k;
+    ifstream inp("input.txt");
+    
+    inp >> n >> k;
+    vector<shusha> test(n);
+    
+    for (int i = 0; i < n; ++i) {
+        inp >> test[i].an;
+        inp >> test[i].mark;
+    }
+    
+    inp.close();
+    
+    string res;
+    rec("", 0, n, k, test, res);
+
+    ofstream out("output.txt");
+    out << res;
+    out.close();
+}

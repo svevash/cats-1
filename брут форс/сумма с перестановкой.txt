@@ -1,0 +1,58 @@
+#include <algorithm>
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+bool check (int find, const string &b) {
+    string f = to_string(find);
+    string bcopy = b;
+    sort(f.begin(), f.end());
+    sort(bcopy.begin(), bcopy.end());
+    if (bcopy != f)
+        return false;
+    return true;
+}
+
+bool genperm(int j, string &s, long long int &sum, string &b) {
+    if (j == s.length()){
+        if (s[0] != '0') {
+            long int find = sum - stoi(s);
+            if (check(find, b)) {
+                ofstream out("output.txt");
+                out << "YES\n" <<  s << ' ' << find;
+                out.close();
+                return true;
+            }
+        }
+    }
+    else {
+        for (int i = j; i < s.length(); i++) {
+            if (s[i] != s[i + 1]) {
+                swap(s[j], s[i]);
+                if (genperm(j + 1, s, sum, b)) return true;
+                swap(s[j], s[i]);
+            }
+        }
+    }
+    return false;
+}
+
+int main() {
+    string a, b;
+    vector<string> gens;
+
+    long long int sum;
+    ifstream inp("input.txt");
+    inp >> a >> b >> sum;
+    inp.close();
+
+    if (!genperm(0, a, sum, b)) {
+        ofstream out("output.txt");
+        out << "NO";
+        out.close();
+    }
+    return 0;
+}
