@@ -1,0 +1,41 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+const int MaxV = 1e9;
+
+using namespace std;
+
+int main() {
+    int e, f, n, w, price, weight;
+    ifstream inp("input.txt");
+    inp >> e >> f >> n;
+    w = f - e;
+    vector<int> bag (w + 1, MaxV);
+
+    bag[0] = 0;
+
+    for (int i = 1; i <= n; ++i) {
+        inp >> price >> weight;
+        for (int j = 0; j < w + 1; ++j) {
+            if (j >= weight) {
+                bag[j] = min(bag[j], bag[j - weight] + price);
+            }
+            else {
+                continue;
+            }
+        }
+    }
+
+    inp.close();
+
+    ofstream out("output.txt");
+    if (bag[w] == MaxV) {
+        out << -1;
+    }
+    else {
+        out << bag[w];
+    }
+
+    return 0;
+}
