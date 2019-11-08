@@ -1,0 +1,67 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <list>
+#include <bits/stdc++.h>
+
+#define SIZE 13109;
+
+using namespace std;
+
+int hashf(int n) {
+    int i = 0;
+    for(; n > 0; n /= 10)
+        i = i * 10 + (n % 10);
+    return i % SIZE;
+}
+
+int main() {
+    vector <list <int>> hasht;
+    vector <int> kkk;
+    hasht.resize(13109);
+    ifstream inp("input.txt");
+    ofstream outp("output.txt");
+
+    list<int>::iterator iter;
+    int a;
+    while (true) {
+        inp >> a;
+        if (a == 0) break;
+        else if (a > 0) {
+            bool exist = false;
+            for (auto v : hasht[hashf(a)]) {
+               if (v == a) {
+                   exist = true;
+                   break;
+               }
+            }
+            if (!exist) {
+                hasht[hashf(a)].push_back(a);
+            }
+        }
+        else {
+            for (iter = hasht[hashf(-a)].begin(); iter != hasht[hashf(-a)].end(); ++iter) {
+                if (*iter == -a) {
+                    hasht[hashf(-a)].remove(*iter);
+                    break;
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < hasht.size(); ++i){
+        if (hasht[i].empty()) continue;
+        for (auto v : hasht[i])
+            kkk.push_back(v);
+    }
+
+    sort(kkk.begin(), kkk.end());
+
+    for (auto j = kkk.begin(); j != kkk.end(); ++j)
+        outp << *j << ' ';
+
+    inp.close();
+    outp.close();
+
+    return 0;
+}
