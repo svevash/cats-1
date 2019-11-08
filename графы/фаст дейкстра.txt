@@ -1,0 +1,59 @@
+#include <iostream>
+#include <fstream>
+#include <set>
+#include <vector>
+
+const long long int inf = 100000000;
+
+using namespace std;
+
+void dijkstra(int v, vector<vector<pair<int, int>>> &e, vector<long long int> &res) {
+	int n = e.size();
+	res.assign(n, inf);
+	res[v] = 0;
+	set<pair<long long int, long long int>> q;
+	
+	for (int i = 0; i < n; ++i) {
+		q.insert(make_pair(res[i], i));
+	}
+	
+	while (!q.empty()) {
+		pair<int, int> vmindist = *q.begin();
+		q.erase(q.begin());
+		
+		for (int i = 0; i < e[vmindist.second].size(); ++i) {
+			if (res[e[vmindist.second][i].first] > vmindist.first + e[vmindist.second][i].second) {
+				q.erase(make_pair(res[e[vmindist.second][i].first], e[vmindist.second][i].first));
+				res[e[vmindist.second][i].first] = vmindist.first + e[vmindist.second][i].second;
+				q.insert(make_pair(res[e[vmindist.second][i].first], e[vmindist.second][i].first));
+			}
+		}
+	}
+}
+
+int main() {
+    int v, u, n, m, d, start;
+    ifstream inp("input.txt");
+
+    inp >> n >> m >> start;
+    vector<vector<pair<int, int>>> e(n);
+    vector<long long int> res(n);
+    for (int i = 0; i < m; ++i) {
+        inp >> v >> u >> d;
+        e[v - 1].push_back(make_pair(u - 1, d));
+    }
+    inp.close();
+    dijkstra(start - 1, e, res);
+
+    ofstream out("output.txt");
+    for (int i = 0; i < n; ++i) {
+        if (res[i] < inf) {
+            out << res[i] << " ";
+        }
+        else {
+            out << -1 << " ";
+        }
+    }
+    out.close();
+    return 0;
+}

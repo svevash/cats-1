@@ -1,0 +1,50 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+const int MaxV = INT_MAX;
+using namespace std;
+
+struct edge {
+    int u, v, weight;
+};
+
+int main() {
+    int n, m, start, x1, x2, w;
+    ifstream inp("input.txt");
+    inp >> n >> m >> start;
+
+    vector<edge> edges(m);
+    vector<int> res(n, MaxV);
+    res[start - 1] = 0;
+
+    for (int i = 0; i < m; ++i) {
+        inp >> x1 >> x2 >> w;
+        edges[i].u = x1 - 1;
+        edges[i].v = x2 - 1;
+        edges[i].weight = w;
+    }
+
+    inp.close();
+
+    for (int i = 0; i < n - 1; ++i) {
+        for (int j = 0; j < m; ++j) {
+            if (res[edges[j].u] < MaxV) {
+                res[edges[j].v] = min(res[edges[j].v], res[edges[j].u] + edges[j].weight);
+            }
+        }
+    }
+
+    ofstream out("output.txt");
+    for (int i = 0; i < n; ++i) {
+        if (res[i] != MaxV) {
+            out << res[i] << " ";
+        }
+        else {
+            out << "  ";
+        }
+    }
+    out.close();
+    
+    return 0;
+}

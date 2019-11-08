@@ -1,0 +1,59 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <set>
+
+using namespace std;
+
+void dfs(int v, vector<vector<int>> &graph, set<pair<int, int>> &usedEdges, vector<int> &res, bool &success) {
+    if (graph[v].size() % 2) {
+        success = false;
+        return;
+    }
+
+    for (int i = 0; i < graph[v].size(); ++i) {
+        pair<int, int> e = make_pair(min(v, graph[v][i]), max(v, graph[v][i]));
+        if (usedEdges.find(e) != usedEdges.end()) {
+            usedEdges.erase(e);
+            dfs(graph[v][i], graph, usedEdges, res, success);
+        }
+    }
+    res.push_back(v + 1);
+}
+
+int main() {
+    int n, m, u, v;
+    bool success = true;
+
+    ifstream inp("input.txt");
+
+    inp >> n >> m;
+    set<pair<int, int>> usedEdges;
+
+    vector<vector<int>> graph(n);
+    vector<int> res;
+    for (int i = 0; i < m; ++i) {
+        inp >> u >> v;
+        graph[u - 1].push_back(v - 1);
+        graph[v - 1].push_back(u - 1);
+
+        pair<int, int> e = make_pair(min(u - 1, v - 1), max(u - 1, v - 1));
+        usedEdges.insert(e);
+
+    }
+    inp.close();
+
+    dfs(0, graph, usedEdges, res, success);
+
+    ofstream out("output.txt");
+    if (success) {
+        for (int i = 0; i < res.size(); i++) {
+            out << res[i] << " ";
+        }
+    }
+    else {
+        out << -1;
+    }
+    out.close();
+    return 0;
+}

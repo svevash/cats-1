@@ -1,0 +1,77 @@
+#include <fstream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+struct edge {
+	int v, u, weight;
+};
+
+int findSet(int v, vector<int> &parent) {
+    if (v == parent[v]) {
+        return v;
+    }
+    parent[v] = findSet(parent[v], parent);
+    return parent[v];
+}
+
+void makeSet(int v, vector<int> &parent) {
+	parent[v] = v;
+}
+
+void unionSets(int v, int u, vector<int> &parent) {
+	v = findSet(v, parent);
+	u = findSet(u, parent);
+	if (v != u) {
+		parent[u] = v;
+	}
+}
+
+int main() {
+    int n, m, x1, x2, w;
+	ifstream inp("input.txt");
+	inp >> n >> m;
+    vector <int> parent(n);
+    vector <bool> used(n, false);
+	vector <edge> edges(m);
+	for (int i = 0; i < m; i++) {
+		inp >> x1 >> x2 >> w;
+
+		edges[i].v = x1 - 1;
+		edges[i].u = x2 - 1;
+		edges[i].weight = w;
+	}
+	inp.close();
+
+	auto cmp = [](const edge& start, const edge& end) {
+		return start.weight < end.weight;
+	};
+	sort(edges.begin(), edges.end(), cmp);
+
+	for (int i = 0; i < n; i++) {
+		makeSet(i, parent);
+	}
+
+	long long sum = 0;
+	long countEdges = 0;
+	for (int i = 0; i < m; i++) {
+		int u = edges[i].u;
+		int v = edges[i].v;
+
+		if (findSet(u, parent) != findSet(v, parent)) {
+			unionSets(u, v, parent);
+			sum += edges[i].weight;
+			countEdges++;
+		}
+	}
+
+    ofstream out("output.txt");
+	if (countEdges < n - 1) {
+		out << -1;
+	}
+	else {
+		out << sum;
+	}
+	out.close();
+}

@@ -1,0 +1,65 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+enum color {white, grey, black};
+
+bool dfs(int u, vector<vector<int>> &graph, vector<color> &col, vector<int> &res) {
+    col[u] = grey;
+    for (int i = 0; i < graph[u].size(); ++i) {
+        int v = graph[u][i];
+        if (col[v] == white) {
+            if (dfs(v, graph, col, res)) {
+                return true;
+            }
+        }
+        else if (col[v] == grey) {
+            return true;
+        }
+    }
+    col[u] = black;
+    res.push_back(u + 1);
+    return false;
+}
+
+vector<int> topsort(vector<vector<int>> &graph, vector<color> &col, vector<int> &res) {
+    for (int i = 0; i < col.size(); i++) {
+        if (col[i] == white) {
+            if (dfs(i, graph, col, res)) {
+                res.clear();
+                res.push_back(-1);
+                return res;
+            }
+        }
+    }
+    return res;
+}
+
+int main() {
+    int n, m;
+    ifstream inp("input.txt");
+    inp >> n >> m;
+
+    vector<color> col(n, white);
+    vector<vector<int>> graph(n);
+    vector<int> res;
+
+    for (int i = 0; i < m; ++i) {
+        int x1, x2;
+        inp >> x1 >> x2;
+        graph[x1 - 1].push_back(x2 - 1);
+    }
+    inp.close();
+
+    topsort(graph, col, res);
+
+    ofstream out("output.txt");
+    for (int i = res.size() - 1; i >= 0; --i) {
+        out << res[i] << " ";
+    }
+    out.close();
+    
+    return 0;
+}

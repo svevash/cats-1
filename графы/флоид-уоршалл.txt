@@ -1,0 +1,52 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+int main() {
+    ifstream inp("input.txt");
+    int n, m, x, y;
+    inp >> n >> m;
+
+    vector<vector<int>> table (n, vector<int>(n, INT_MAX));
+    for (int i = 0; i < m; ++i) {
+        inp >> x >> y;
+        inp >> table[x - 1][y - 1];
+    }
+    inp.close();
+
+    for (int k = 0; k < n; ++k) {
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (table[i][k] < INT_MAX && table[k][j] < INT_MAX) {
+                    table[i][j] = min(table[i][j], table[i][k] + table[k][j]);
+
+                }
+            }
+        }
+    }
+
+    ofstream out("output.txt");
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            if (i == j) {
+                out << 0;
+            }
+            else if (table[i][j] != INT_MAX) {
+                out << table[i][j];
+            }
+            else {
+                out << " ";
+            }
+
+            if (j < n - 1) {
+                out << " ";
+            }
+        }
+        if (i < n - 1)
+            out << "\n";
+    }
+    out.close();
+    return 0;
+}

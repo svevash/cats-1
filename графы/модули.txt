@@ -1,0 +1,77 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+enum color {white, black};
+
+//void dfs (vector<vector<bool>> &matrix, vector<color> &col, int u) {
+//    col[u] = black;
+//    for (int v = u + 1; v < col.size(); ++v) {
+//        int u1 = u;
+//        int v1 = v;
+//        if (v > u) {
+//            u1 = v;
+//            v1 = u;
+//        }
+//        if (v != u && matrix[u1][v1] == true) {
+//            if (col[v] == white) {
+//                dfs(matrix, col, v);
+//            }
+//        }
+//    }
+//}
+
+void dfs (vector<vector<int>> &lilist, vector<color> &col, int u) {
+    col[u] = black;
+    for (int i = 0; i < lilist[u].size(); ++i) {
+        if (col[lilist[u][i]] == white) {
+            dfs(lilist, col, lilist[u][i]);
+        }
+    }
+}
+
+int main() {
+    int n, m;
+    vector<color> col;
+    ifstream inp("input.txt");
+    inp >> n >> m;
+    //vector<vector<bool>> matrix;
+    vector<vector<int>> lilist;
+    lilist.resize(n);
+    col.resize(n);
+    for (int i = 0; i < n; ++i) {
+        col[i] = white;
+        //matrix[i + 1].resize(i + 1);
+    }
+
+    for (int i = 0; i < m; ++i) {
+        int x1, x2;
+        inp >> x1 >> x2;
+//        if (x1 < x2) {
+//            matrix[x2 - 1][x1 - 1] = true;
+//        }
+//        else {
+//            matrix[x1 - 1][x2 - 1] = true;
+//        }
+        x1--;
+        x2--;
+        lilist[x1].push_back(x2);
+        lilist[x2].push_back(x1);
+    }
+    inp.close();
+
+    int count = 0;
+    for (int i = 0; i < n; ++i) {
+        if (col[i] == white) {
+            //dfs(matrix, col, i);
+            dfs(lilist, col, i);
+            count++;
+        }
+    }
+    ofstream out("output.txt");
+    out << count;
+    out.close();
+    return 0;
+}
