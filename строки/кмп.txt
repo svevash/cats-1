@@ -1,0 +1,61 @@
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+int main() {
+    string t, s;
+
+    ifstream inp("input.txt");
+
+    getline(inp, s);
+    getline(inp, t);
+
+    inp.close();
+
+    int n = t.size();
+    vector<int> pi (n);
+    for (int i = 1; i < n; ++i) {
+        int k = pi[i - 1];
+        while (k > 0 && t[i] != t[k])
+            k = pi[k - 1];
+        if (t[i] == t[k])
+            ++k;
+        pi[i] = k;
+    }
+    //bool onechar = false;
+    //if (t.size() == 1)
+    //    onechar = true;
+    int pos = -1, q = 0;
+    for (int i = 0; i < s.size(); ++i) {
+        //if (onechar) {
+        //    if (t[0] == s[i]) {
+        //        ofstream out("output.txt");
+        //        out << i + 1;
+        //        out.close();
+        //        return 0;
+        //    }
+        //}
+        while (q > 0 && t[q] != s[i]) {
+            q = pi[q-1];
+        }
+        if (t[q] == s[i]) {
+            q++;
+        }
+        if(q == t.size()) {
+            pos = i - q + 2;
+            break;
+        }
+    }
+
+
+    ofstream out("output.txt");
+    //if (onechar) {
+    //    out << "-1";
+    //}
+    //else {
+        out << pos;
+    //}
+    out.close();
+    return 0;
+}
