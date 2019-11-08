@@ -1,0 +1,48 @@
+program conditionary;
+
+var
+  n, m, i, j, res, price, power, k, min: integer;
+  rooms: array of integer;
+  condit: array [1..1000] of int32;
+
+begin
+  assign(input, 'cond.in');
+  reset(input);
+  assign(output, 'cond.out');
+  rewrite(output);
+
+  readln(n);
+  setlength(rooms, n);
+
+  for i := 1 to 1000 do
+    condit[i] := -1;
+
+  for i := 0 to n-1 do
+    read(rooms[i]);
+
+  readln(m);
+
+  for i := 0 to m-1 do
+  begin
+    read(power, price);
+    if condit[power] = -1 then
+      condit[power] := price
+    else
+      if condit[power] > price then
+        condit[power] := price;
+  end;
+
+  for i := 0 to n-1 do
+  begin
+    k := rooms[i];
+    min := 1001;
+    for j := k to 1000 do
+    begin
+      if (condit[j] <> -1) and (condit[j] < min) then
+        min := condit[j];
+    end;
+    res += min;
+  end;
+
+  writeln(res);
+end.

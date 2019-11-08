@@ -1,0 +1,59 @@
+program lsd;
+
+var
+  n, tmp, count: dword;
+  i, k, d: integer;
+  bucket: array[0..256] of integer;
+  words, help: array of string[3];
+
+begin
+  assign(input, 'input.txt');
+  reset(input);
+  assign(output, 'output.txt');
+  rewrite(output);
+
+  readln(n);
+  setlength(words, n);
+
+  setlength(help, n);
+
+  for i := 0 to n-1 do
+  begin
+    readln(words[i]);
+  end;
+
+  for i := 3 downto 1 do
+  begin
+    for k := 0 to 256 do
+      bucket[k] := 0;
+
+    for k := 0 to n-1 do
+    begin
+      d := ord(words[k][i]);
+      bucket[d] += 1;
+    end;
+
+    count := 0;
+    for k := 0 to 256 do
+    begin
+      tmp := bucket[k];
+      bucket[k] := count;
+      count += tmp;
+    end;
+    for k := 0 to n - 1 do
+    begin
+      d := ord(words[k][i]);
+      help[bucket[d]] := words[k];
+      bucket[d] += 1;
+    end;
+
+    for k := 0 to n - 1 do
+    begin
+      words[k] := help[k];
+    end;
+  end;
+
+
+  for i := 0 to n-1 do
+    writeln(words[i]);
+end.

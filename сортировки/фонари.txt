@@ -1,0 +1,28 @@
+program fonari;
+var
+  f, length, height, i, j, res: integer;
+  street: array [1..100] of integer;
+begin
+  assign(input, 'input.txt');
+  reset(input);
+  assign(output, 'output.txt');
+  rewrite(output);
+  readln(f);
+  for i := 1 to f do
+  begin
+    read(length, height);
+    for j := length-height+1 to length+height do
+    begin
+      if j<1 then continue;
+      if j>100 then break;
+      street[j] += 1;
+    end;
+  end;
+  res := street[1];
+  for i := 1 to 100 do
+  begin
+    if street[i] > res then
+      res := street[i];
+  end;
+  writeln(res);
+end.

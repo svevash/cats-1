@@ -1,0 +1,128 @@
+program big;
+
+type
+  TData = integer;
+
+  PArrayStack = ^TArrayStack;
+
+  TArrayStack = record
+    size, maxSize: integer;
+    Data: array of TData;
+  end;
+
+  function newArrayStack(maxSize: integer): PArrayStack;
+  var
+    p: parraystack;
+  begin
+    new(p);
+    if (p = nil) then
+      exit(nil);
+    try
+      setlength(p^.Data, maxsize);
+    except
+      dispose(p);
+      exit(nil);
+    end;
+    p^.maxSize := maxsize;
+    p^.size := 0;
+    exit(p);
+  end;
+
+  function pushData(Stack: PArrayStack; const Data: TData): boolean;
+  begin
+    if (stack^.size = stack^.maxsize) then
+      exit(False);
+    stack^.Data[stack^.size] := Data;
+    stack^.size += 1;
+    exit(True);
+  end;
+
+  function popData(Stack: PArrayStack): TData;
+  begin
+    if stack^.size = 0 then
+      exit;
+    Result := stack^.Data[stack^.size - 1];
+    stack^.size -= 1;
+  end;
+
+var
+  st: parraystack;
+  n, i, x, sign, k, time, t, res, z: integer;
+  boom: array of integer;
+  current: tdata;
+
+  procedure qsort(l, r: integer);
+  var
+    i, j: integer;
+    x, t: integer;
+  begin
+    i := l;
+    j := r;
+    x := boom[(l + r) div 2];
+    while i < j do
+    begin
+      while boom[i] < x do
+        i += 1;
+      while boom[j] > x do
+        j -= 1;
+      if i <= j then
+      begin
+        t := boom[i];
+        boom[i] := boom[j];
+        boom[j] := t;
+        i += 1;
+        j -= 1;
+      end;
+    end;
+    if i < r then
+      qsort(i, r);
+    if l < j then
+      qsort(l, j);
+  end;
+
+begin
+  assign(input, 'linear.in');
+  reset(input);
+  assign(output, 'linear.out');
+  rewrite(output);
+  readln(n);
+  st := newarraystack(200000);
+  setlength(boom, n div 2);
+  k := 0;
+
+  for i := 0 to n - 1 do
+  begin
+    Read(x);
+    readln(sign);
+    if sign = 1 then
+      pushdata(st, x)
+    else
+    begin
+      if st^.size > 0 then
+      begin
+        current := popdata(st);
+        if (x - current) mod 2 <> 0 then
+          boom[k] := (x - current) div 2 + 1
+        else
+          boom[k] := (x - current) div 2;
+        //writeln('boomk = ',boom[k]);
+        k += 1;
+      end;
+    end;
+  end;
+
+  res := n;
+  z := 0;
+  qsort(0, k - 1);
+  readln(time);
+  for i := 0 to time - 1 do
+  begin
+    Read(t);
+    while (t >= boom[z]) and (z <= k - 1) do
+    begin
+      res -= 2;
+      z += 1;
+    end;
+    writeln(res);
+  end;
+end.

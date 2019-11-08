@@ -1,0 +1,70 @@
+var
+  a: array of int32;
+  i,k,n:integer;
+
+function part(p,r: integer): integer;
+var i,j:integer;
+  x,t:int32;
+begin
+  x := a[r];
+  i := p-1;
+  for j := p to r-1 do
+  begin
+    if a[j] <= x then
+    begin
+      i +=1;
+      t := a[i];
+      a[i] := a[j];
+      a[j] := t;
+    end;
+  end;
+  t := a[i+1];
+  a[i+1] := a[r];
+  a[r] := t;
+  result := i+1;
+end;
+
+function rpart(p,r:integer):integer;
+var j:integer;
+  t:int32;
+begin
+  j := random(r-p+1)+p;
+  t:=a[r];
+  a[r]:=a[j];
+  a[j]:=t;
+  result:=part(p,r);
+end;
+
+procedure search(p,r,j:integer);
+var q,m: integer;
+begin
+  if p=r then
+  begin
+    writeln(a[p]);
+    exit;
+  end;
+  q := rpart(p,r);
+  m := q-p+1;
+  if j=m then
+  begin
+    writeln(a[q]);
+    exit;
+  end
+  else if j<m then
+    search(p,q-1,j)
+  else
+    search(q+1,r,j-m);
+end;
+
+begin
+  assign(input,'input.txt');
+  reset(input);
+  assign(output,'output.txt');
+  rewrite(output);
+  read(n);
+  setlength(a,n);
+  read(k);
+  for i:= 0 to n-1 do
+    read(a[i]);
+  search(0,n-1,k);
+end.

@@ -1,0 +1,52 @@
+program stat;
+
+var
+  n, i, j: integer;
+  a: array of integer;
+
+  procedure qsort(l, r: integer);
+  var
+    i, j, x, t: integer;
+  begin
+    i := l;
+    j := r;
+    x := a[(l + r) div 2];
+    while i < j do
+    begin
+      while a[i] < x do
+        i += 1;
+      while a[j] > x do
+        j -= 1;
+      if i <= j then
+      begin
+        t := a[i];
+        a[i] := a[j];
+        a[j] := t;
+        i += 1;
+        j -= 1;
+      end;
+    end;
+    if i < r then
+      qsort(i, r);
+    if l < j then
+      qsort(l, j);
+  end;
+
+begin
+  Assign(input, 'input.txt');
+  reset(input);
+  Assign(output, 'output.txt');
+  rewrite(output);
+  Read(n);
+  if n = 0 then
+    exit;
+  setlength(a, n);
+  for i := 0 to n - 1 do
+  begin
+    Read(a[i]);
+  end;
+
+  qsort(0, n - 1);
+  for i := 0 to n-1 do
+    Write(a[i], ' ');
+end.
